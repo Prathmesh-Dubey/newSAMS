@@ -110,17 +110,37 @@ document.addEventListener("DOMContentLoaded", function () {
     return domPos - 1;
   }
 
+  function handleSettle() {
+    const domPos = findClosestDomPos();
+    if (domPos === 0) {
+      suppressScrollSync = true;
+      currentIndex = total - 1;
+      jumpInstant(total);
+      markActive(currentIndex);
+      suppressScrollSync = false;
+    } else if (domPos === slides.length - 1) {
+      suppressScrollSync = true;
+      currentIndex = 0;
+      jumpInstant(1);
+      markActive(currentIndex);
+      suppressScrollSync = false;
+    }
+  }
+
   // Two things happen on scroll, at different cadences:
   // 1) Live, every frame — whichever card is currently closest to center
   //    gets marked active right away, so only one card is ever opaque at
   //    a time during a drag. Waiting until the scroll fully stops to
   //    decide this caused both cards to sit at the same faded opacity
   //    mid-swipe, and their overlapping text visibly double-exposed.
-  // 2) Once settled (debounced) — if we landed on one of the two clones,
-  //    snap instantly to the real card underneath (identical in
-  //    appearance, so the correction is invisible).
+  // 2) Once settled — if we landed on one of the two clones, snap
+  //    instantly to the real card underneath (identical in appearance,
+  //    so the correction is invisible). Prefer the native `scrollend`
+  //    event where supported: it fires exactly when the browser (and any
+  //    touch-momentum/snap animation) has truly finished, which a fixed
+  //    debounce can only approximate — important on real touch devices
+  //    where a fast flick's momentum can outlast a short timer.
   let liveFrame = null;
-  let settleTimer = null;
   stage.addEventListener("scroll", () => {
     if (suppressScrollSync) return;
 
@@ -132,25 +152,20 @@ document.addEventListener("DOMContentLoaded", function () {
         markActive(currentIndex);
       }
     });
-
-    if (settleTimer) clearTimeout(settleTimer);
-    settleTimer = setTimeout(() => {
-      const domPos = findClosestDomPos();
-      if (domPos === 0) {
-        suppressScrollSync = true;
-        currentIndex = total - 1;
-        jumpInstant(total);
-        markActive(currentIndex);
-        suppressScrollSync = false;
-      } else if (domPos === slides.length - 1) {
-        suppressScrollSync = true;
-        currentIndex = 0;
-        jumpInstant(1);
-        markActive(currentIndex);
-        suppressScrollSync = false;
-      }
-    }, 120);
   });
+
+  if ("onscrollend" in window) {
+    stage.addEventListener("scrollend", () => {
+      if (!suppressScrollSync) handleSettle();
+    });
+  } else {
+    let settleTimer = null;
+    stage.addEventListener("scroll", () => {
+      if (suppressScrollSync) return;
+      if (settleTimer) clearTimeout(settleTimer);
+      settleTimer = setTimeout(handleSettle, 120);
+    });
+  }
 
   // Keyboard arrow-key navigation while the carousel is in view.
   let inView = false;

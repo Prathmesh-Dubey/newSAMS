@@ -133,6 +133,12 @@ document.addEventListener("DOMContentLoaded", function () {
   //    a time during a drag. Waiting until the scroll fully stops to
   //    decide this caused both cards to sit at the same faded opacity
   //    mid-swipe, and their overlapping text visibly double-exposed.
+  //    A real finger drag wobbles slightly frame to frame though, so
+  //    right around the midpoint between two cards "which one is
+  //    closest" can flip back and forth many times a second — without a
+  //    hysteresis margin that flips the active/faded styling on every
+  //    tiny wobble too, visibly fluttering. Require the challenger to be
+  //    clearly (not just marginally) closer before switching.
   // 2) Once settled — if we landed on one of the two clones, snap
   //    instantly to the real card underneath (identical in appearance,
   //    so the correction is invisible). Prefer the native `scrollend`
@@ -140,15 +146,20 @@ document.addEventListener("DOMContentLoaded", function () {
   //    touch-momentum/snap animation) has truly finished, which a fixed
   //    debounce can only approximate — important on real touch devices
   //    where a fast flick's momentum can outlast a short timer.
+  const SWITCH_HYSTERESIS = 32; // px
   let liveFrame = null;
   stage.addEventListener("scroll", () => {
     if (suppressScrollSync) return;
 
     if (liveFrame) cancelAnimationFrame(liveFrame);
     liveFrame = requestAnimationFrame(() => {
-      const realIdx = domPosToReal(findClosestDomPos());
-      if (realIdx !== currentIndex) {
-        currentIndex = realIdx;
+      const currentDomPos = toDomPos(currentIndex);
+      const currentDist = Math.abs(centerTarget(currentDomPos) - stage.scrollLeft);
+      const candidateDomPos = findClosestDomPos();
+      const candidateDist = Math.abs(centerTarget(candidateDomPos) - stage.scrollLeft);
+
+      if (candidateDomPos !== currentDomPos && candidateDist + SWITCH_HYSTERESIS < currentDist) {
+        currentIndex = domPosToReal(candidateDomPos);
         markActive(currentIndex);
       }
     });

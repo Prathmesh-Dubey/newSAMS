@@ -471,7 +471,12 @@ a {
 
 .cc-stage {
   display: flex;
-  align-items: stretch;
+  /* flex-start (not stretch) — cards vary a lot in content length (the
+     badge-grid "Country approvals" card is much taller than "Android
+     Enterprise"). Stretching every card to match the tallest one left a
+     huge dead gap of empty space in the shorter cards, which looked
+     stretched/unbalanced, especially on narrow mobile widths. */
+  align-items: flex-start;
   /* Padding is derived from the same width var as the card so the first
      and last card can scroll to a fully centered position too — a plain
      percentage flex-basis on the card would resolve against this stage's

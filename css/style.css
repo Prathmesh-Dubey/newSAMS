@@ -457,20 +457,45 @@ a {
 .cc-viewport {
   position: relative;
   outline: none;
-  padding: 30px 110px;
+  padding: 30px 70px;
+}
+
+.cert-carousel {
+  /* cc-container padding (60px) + cc-viewport padding (70px), each side,
+     plus a margin so there's always room left over for the peek. */
+  --cc-card-w: min(calc(100vw - 300px), 760px);
+  /* How much a card overlaps the next one, revealing it underneath —
+     this is what gives the stacked look instead of a plain flex gap. */
+  --cc-card-overlap: 0.34;
 }
 
 .cc-stage {
-  position: relative;
-  height: 560px;
+  display: flex;
+  align-items: stretch;
+  /* Padding is derived from the same width var as the card so the first
+     and last card can scroll to a fully centered position too — a plain
+     percentage flex-basis on the card would resolve against this stage's
+     own post-padding content box, undershooting the intended width. */
+  padding: 0 calc((100% - var(--cc-card-w)) / 2);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.cc-stage::-webkit-scrollbar {
+  display: none;
 }
 
 .cc-card {
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 720px;
-  max-width: 100%;
+  position: relative;
+  flex: 0 0 var(--cc-card-w);
+  width: var(--cc-card-w);
+  margin-right: calc(var(--cc-card-w) * -1 * var(--cc-card-overlap));
+  z-index: 1;
+  scroll-snap-align: center;
   background: var(--white);
   border: 1px solid var(--border-light);
   border-radius: 20px;
@@ -478,39 +503,23 @@ a {
   box-shadow: 0 10px 34px rgba(20, 45, 70, 0.07);
   display: flex;
   flex-direction: column;
-  cursor: grab;
-  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.45s ease, box-shadow 0.35s ease;
-  transform: translate(-50%, 0) scale(0.86);
-  opacity: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.cc-card:active {
-  cursor: grabbing;
-}
-
-.cc-card.is-prev {
   opacity: 0.55;
-  transform: translate(-108%, 0) scale(0.88);
-  z-index: 2;
-  pointer-events: auto;
+  transform: scale(0.9);
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.35s ease, box-shadow 0.35s ease;
+  cursor: pointer;
 }
 
-.cc-card.is-next {
-  opacity: 0.55;
-  transform: translate(8%, 0) scale(0.88);
-  z-index: 2;
-  pointer-events: auto;
+.cc-card:last-child {
+  margin-right: 0;
 }
 
 .cc-card.is-active {
   opacity: 1;
-  transform: translate(-50%, 0) scale(1);
-  z-index: 3;
+  transform: scale(1);
   box-shadow: 0 24px 60px rgba(20, 45, 70, 0.16);
-  pointer-events: auto;
+  cursor: default;
+  z-index: 2;
 }
 
 .cc-quote {
@@ -687,37 +696,40 @@ a {
   top: 50%;
   transform: translateY(-50%);
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
+  width: auto;
+  height: auto;
+  border-radius: 0;
   border: none;
   background: none;
   color: var(--sky-blue);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 8px;
   cursor: pointer;
-  transition: color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  box-shadow: none;
+  transition: color 0.2s ease, transform 0.2s ease;
   z-index: 4;
 }
 
 .cc-arrow-prev {
-  left: 16px;
+  left: -4px;
 }
 
 .cc-arrow-next {
-  right: 16px;
+  right: -4px;
 }
 
 .cc-arrow svg {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: 48px;
+  stroke-width: 3;
 }
 
 .cc-arrow:hover {
-  background: var(--sky-blue-light);
+  background: none;
   color: var(--sky-blue-dark);
-  transform: translateY(-50%) scale(1.1);
+  transform: translateY(-50%) scale(1.12);
 }
 
 .cc-arrow:disabled {
@@ -2374,12 +2386,12 @@ a {
   .cc-title {
     font-size: 48px;
   }
-  .cc-card {
-    width: 600px;
-    padding: 44px 46px;
+  .cert-carousel {
+    /* cc-container padding (40px) + cc-viewport padding (70px), each side. */
+    --cc-card-w: min(calc(100vw - 260px), 600px);
   }
-  .cc-stage {
-    height: 560px;
+  .cc-card {
+    padding: 44px 46px;
   }
 
   .tov-title {
@@ -2392,6 +2404,52 @@ a {
 
   .countries__panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1040px) {
+  /* Below this width, the fixed 270px region sidebar left too little room
+     for the countries grid next to it (each cell shrank to ~120px, so
+     names like "Bahrain" truncated to "B."). Stack the tabs above the
+     grid instead of squeezing them side by side. */
+  .reach__cols {
+    flex-direction: column;
+    gap: 16px;
+    background: none;
+    border: none;
+    border-radius: 0;
+    overflow: visible;
+  }
+  .regions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 10px;
+    padding: 0;
+    border-right: none;
+  }
+  .region {
+    flex: 0 0 auto;
+    width: auto;
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  .region[aria-selected="true"] {
+    border-color: var(--sky-blue);
+  }
+  .countries {
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: 14px;
+    overflow: hidden;
+    padding: 0;
+  }
+  .country--wide {
+    grid-column: auto;
+    background: var(--white);
   }
 }
 
@@ -2481,32 +2539,22 @@ a {
   .cc-viewport {
     padding: 20px 42px;
   }
-  .cc-stage {
-    height: 560px;
+  .cert-carousel {
+    /* cc-container padding (24px) + cc-viewport padding (42px), each side. */
+    --cc-card-w: min(calc(100vw - 152px), 420px);
   }
   .cc-card {
-    width: min(84vw, 420px);
     padding: 28px 26px;
   }
-  .cc-card.is-prev {
-    transform: translate(-118%, 0) scale(0.86);
-  }
-  .cc-card.is-next {
-    transform: translate(18%, 0) scale(0.86);
-  }
-  .cc-arrow {
-    width: 38px;
-    height: 38px;
-  }
   .cc-arrow-prev {
-    left: 0;
+    left: -2px;
   }
   .cc-arrow-next {
-    right: 0;
+    right: -2px;
   }
   .cc-arrow svg {
-    width: 24px;
-    height: 24px;
+    width: 32px;
+    height: 32px;
   }
 
   .tov {
@@ -2707,6 +2755,11 @@ a {
   }
   .reach__body {
     flex-direction: column;
+    /* align-items: flex-start (the desktop row default) controls cross-
+       axis alignment — once the layout is a column, that axis is width,
+       so "flex-start" meant "don't stretch, size to content" and let
+       reach__right balloon out to its content's full intrinsic width. */
+    align-items: stretch;
     gap: 36px;
   }
   .reach__left {
@@ -2716,9 +2769,6 @@ a {
   .reach h2 {
     font-size: 32px;
     margin-bottom: 24px;
-  }
-  .countries__panel {
-    grid-template-columns: 1fr;
   }
 
   .distributor__inner {
@@ -2799,12 +2849,6 @@ a {
     padding: 8px 12px;
     font-size: 13px;
   }
-  .regions {
-    padding: 16px;
-  }
-  .countries {
-    padding: 16px;
-  }
   .country {
     padding: 12px 14px;
     font-size: 13.5px;
@@ -2855,35 +2899,25 @@ a {
   .cc-viewport {
     padding: 16px 30px;
   }
-  .cc-stage {
-    height: 600px;
+  .cert-carousel {
+    /* cc-container padding (24px) + cc-viewport padding (30px), each side. */
+    --cc-card-w: min(calc(100vw - 128px), 380px);
   }
   .cc-card {
-    width: 84vw;
     padding: 22px;
-  }
-  .cc-card.is-prev {
-    transform: translate(-112%, 0) scale(0.84);
-  }
-  .cc-card.is-next {
-    transform: translate(12%, 0) scale(0.84);
   }
   .cc-card-title {
     font-size: 23px;
   }
-  .cc-arrow {
-    width: 34px;
-    height: 34px;
-  }
   .cc-arrow svg {
-    width: 20px;
-    height: 20px;
+    width: 26px;
+    height: 26px;
   }
   .cc-arrow-prev {
-    left: -4px;
+    left: -6px;
   }
   .cc-arrow-next {
-    right: -4px;
+    right: -6px;
   }
 
   .tov-slide-details {

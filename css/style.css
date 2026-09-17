@@ -1086,6 +1086,11 @@ a {
 }
 
 .tov-detail-value {
+  /* Block (not the default inline for a span) so overflow/text-overflow
+     actually apply — on an inline element they're silently ignored per
+     spec, which let long nowrap text bleed past its own column and
+     visually overlap the next one on narrow screens. */
+  display: block;
   font-size: clamp(18px, 1.3vw, 24px);
   font-weight: 700;
   color: var(--text-dark);
@@ -2596,10 +2601,6 @@ a {
     max-width: 100%;
     font-size: 14px;
     line-height: 1.45;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
   }
   .tov-showcase {
     grid-template-columns: 1fr;
@@ -2634,10 +2635,6 @@ a {
     line-height: 1.45;
     max-width: 100%;
     margin-bottom: 2vh;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
-    overflow: hidden;
   }
   .tov-slide-divider {
     margin-bottom: 2vh;
@@ -2656,9 +2653,8 @@ a {
   }
   .tov-detail-value {
     font-size: 15px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    white-space: normal;
+    overflow-wrap: break-word;
   }
   .tov-nav {
     width: 38px;

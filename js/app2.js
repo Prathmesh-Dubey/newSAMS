@@ -279,40 +279,216 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
   /* ---------------------------------------------------------------- */
-  /* Risk zones                                                         */
+  /* Global reach: a real rotating orthographic-projection globe        */
   /* ---------------------------------------------------------------- */
-  (function riskZones() {
-    const tabs = Array.from(document.querySelectorAll(".s2-rz__tab"));
-    const badge = document.getElementById("rzBadge2");
-    const desc = document.getElementById("rzDesc2");
-    const example = document.getElementById("rzExample2");
-    const art = document.getElementById("rzArt2");
-    if (!tabs.length || !badge || !desc || !example) return;
+  (function reachGlobe() {
+    const svgEl = document.getElementById("s2Globe");
+    const landG = document.getElementById("s2GlobeLand");
+    const gratG = document.getElementById("s2GlobeGrat");
+    const routesG = document.getElementById("s2GlobeRoutes");
+    const markersG = document.getElementById("s2GlobeMarkers");
+    if (!svgEl || !landG || !gratG || !routesG || !markersG) return;
 
-    const DATA = [
-      { badge: "Gas Atmosphere", desc: "Explosive gas atmospheres likely in normal operation.", example: "Areas near tanks, pumps and gas processing equipment.", tint: "gas" },
-      { badge: "Dust Atmosphere", desc: "Combustible dust clouds likely in normal operation.", example: "Milling, processing and bulk handling areas.", tint: "dust" },
-      { badge: "Certification Code", desc: "Intrinsically safe · highest gas group · T4 temperature class.", example: "Limits circuit energy so no spark can ignite hydrogen or acetylene.", tint: "code" },
+    const svgNS = "http://www.w3.org/2000/svg";
+    const CX = 160, CY = 160, R = 134;
+    const LAT0 = 14; // fixed viewing tilt, degrees
+    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Coarse land/sea bitmap: rows = latitude bands (+80 to -80), cols = longitude bands (-180 to +180)
+    const WORLD_ROWS = [
+      [],
+      [[6, 8], [34, 38]],
+      [[4, 9], [17, 19], [30, 38]],
+      [[3, 10], [16, 21], [26, 38]],
+      [[3, 10], [16, 22], [24, 38]],
+      [[3, 9], [17, 21], [23, 37]],
+      [[3, 8], [17, 22], [23, 36]],
+      [[4, 7], [16, 24], [26, 35]],
+      [[4, 6], [16, 25], [27, 32], [33, 36]],
+      [[4, 8], [17, 26], [30, 36]],
+      [[4, 9], [17, 26], [30, 35]],
+      [[4, 9], [18, 25], [31, 35]],
+      [[4, 8], [18, 24], [33, 38]],
+      [[4, 8], [19, 23], [32, 38]],
+      [[5, 7], [20, 23], [33, 37]],
+      [[5, 6], [21, 22], [34, 37]],
+      [[5, 6]],
+      [],
+      [],
+      [],
     ];
+    const ROWS = WORLD_ROWS.length, COLS = 40;
 
-    tabs.forEach((tab) => {
-      tab.addEventListener("click", () => {
-        const i = Number(tab.dataset.rz);
-        tabs.forEach((t) => {
-          t.classList.toggle("is-active", t === tab);
-          t.setAttribute("aria-selected", String(t === tab));
-        });
-        badge.textContent = DATA[i].badge;
-        example.innerHTML = "<strong>Example:</strong> " + DATA[i].example;
-        desc.style.opacity = 0;
-        setTimeout(() => {
-          desc.textContent = DATA[i].desc;
-          desc.style.opacity = 1;
-        }, 150);
-        if (art) art.style.transform = "rotate(" + i * 8 + "deg)";
+    const LAND_POINTS = [];
+    WORLD_ROWS.forEach((ranges, row) => {
+      const lat = 80 - (row * 160) / (ROWS - 1);
+      ranges.forEach(([start, end]) => {
+        for (let col = start; col <= end; col++) {
+          const lon = -180 + (col * 360) / (COLS - 1);
+          LAND_POINTS.push({ lat, lon });
+        }
       });
     });
-    desc.style.transition = "opacity .3s ease";
+
+    const CITIES = {
+      hub: { lat: 51.5, lon: -0.1 }, // London
+      me: { lat: 25.2, lon: 55.3 }, // Dubai
+      am: { lat: 40.7, lon: -74.0 }, // New York
+      apac: { lat: 1.35, lon: 103.8 }, // Singapore
+      af: { lat: -26.2, lon: 28.0 }, // Johannesburg
+    };
+
+    const MERIDIANS = [0, 30, 60, 90, 120, 150, 180, -30, -60, -90, -120, -150];
+    const PARALLELS = [-60, -30, 0, 30, 60];
+
+    function project(lat, lon, lon0) {
+      const φ = (lat * Math.PI) / 180;
+      const φ0 = (LAT0 * Math.PI) / 180;
+      const Δλ = ((lon - lon0) * Math.PI) / 180;
+      const c = Math.sin(φ0) * Math.sin(φ) + Math.cos(φ0) * Math.cos(φ) * Math.cos(Δλ);
+      const x = R * Math.cos(φ) * Math.sin(Δλ);
+      const y = R * (Math.cos(φ0) * Math.sin(φ) - Math.sin(φ0) * Math.cos(φ) * Math.cos(Δλ));
+      return { x: CX + x, y: CY - y, c };
+    }
+
+    // Pre-build land dots + graticule paths once; update attrs each frame.
+    const landEls = LAND_POINTS.map((p) => {
+      const el = document.createElementNS(svgNS, "circle");
+      el.setAttribute("r", "1.6");
+      landG.appendChild(el);
+      return { p, el };
+    });
+
+    const meridianEls = MERIDIANS.map((lon) => {
+      const el = document.createElementNS(svgNS, "path");
+      gratG.appendChild(el);
+      return { lon, el, steps: 24 };
+    });
+    const parallelEls = PARALLELS.map((lat) => {
+      const el = document.createElementNS(svgNS, "path");
+      gratG.appendChild(el);
+      return { lat, el, steps: 48 };
+    });
+
+    const routeKeys = ["me", "am", "apac", "af"];
+    const routeEls = routeKeys.map((key) => {
+      const el = document.createElementNS(svgNS, "path");
+      routesG.appendChild(el);
+      return { key, el };
+    });
+
+    const markerEls = Object.keys(CITIES).map((key) => {
+      const g = document.createElementNS(svgNS, "g");
+      g.setAttribute("class", "s2-globe__marker" + (key === "hub" ? " s2-globe__marker--hub" : ""));
+      const pulse = document.createElementNS(svgNS, "circle");
+      pulse.setAttribute("class", "s2-globe__pulse");
+      pulse.setAttribute("r", key === "hub" ? "5" : "4");
+      const dot = document.createElementNS(svgNS, "circle");
+      dot.setAttribute("class", "s2-globe__dot");
+      dot.setAttribute("r", key === "hub" ? "4.4" : "3.2");
+      g.appendChild(pulse);
+      g.appendChild(dot);
+      markersG.appendChild(g);
+      return { key, g, pulse };
+    });
+
+    function render(lon0) {
+      landEls.forEach(({ p, el }) => {
+        const { x, y, c } = project(p.lat, p.lon, lon0);
+        if (c < -0.04) {
+          el.setAttribute("opacity", "0");
+          return;
+        }
+        const depth = Math.max(c, 0.08);
+        el.setAttribute("cx", x.toFixed(1));
+        el.setAttribute("cy", y.toFixed(1));
+        el.setAttribute("opacity", (0.25 + depth * 0.75).toFixed(2));
+        el.setAttribute("r", (0.9 + depth * 0.9).toFixed(2));
+      });
+
+      meridianEls.forEach(({ lon, el, steps }) => {
+        let d = "";
+        for (let i = 0; i <= steps; i++) {
+          const lat = -90 + (i * 180) / steps;
+          const { x, y } = project(lat, lon, lon0);
+          d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
+        }
+        el.setAttribute("d", d);
+      });
+      parallelEls.forEach(({ lat, el, steps }) => {
+        let d = "";
+        for (let i = 0; i <= steps; i++) {
+          const lon = -180 + (i * 360) / steps;
+          const { x, y } = project(lat, lon, lon0);
+          d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
+        }
+        el.setAttribute("d", d);
+      });
+
+      const pos = {};
+      markerEls.forEach(({ key, g, pulse }) => {
+        const city = CITIES[key];
+        const { x, y, c } = project(city.lat, city.lon, lon0);
+        pos[key] = { x, y, c };
+        const visible = c > 0.05;
+        g.setAttribute("opacity", visible ? "1" : "0");
+        g.setAttribute("transform", "translate(" + x.toFixed(1) + "," + y.toFixed(1) + ")");
+        pulse.style.animationPlayState = visible ? "running" : "paused";
+      });
+
+      const hub = pos.hub;
+      routeEls.forEach(({ key, el }) => {
+        const target = pos[key];
+        if (!hub || !target || hub.c <= 0.05 || target.c <= 0.05) {
+          el.setAttribute("opacity", "0");
+          return;
+        }
+        const mx = (hub.x + target.x) / 2;
+        const my = (hub.y + target.y) / 2;
+        const dx = mx - CX, dy = my - CY;
+        const dist = Math.hypot(dx, dy) || 1;
+        const bulge = 1 + 14 / dist;
+        const qx = CX + dx * bulge;
+        const qy = CY + dy * bulge;
+        el.setAttribute("d", "M" + hub.x.toFixed(1) + "," + hub.y.toFixed(1) + " Q" + qx.toFixed(1) + "," + qy.toFixed(1) + " " + target.x.toFixed(1) + "," + target.y.toFixed(1));
+        el.setAttribute("opacity", "0.7");
+      });
+    }
+
+    let lon0 = 20;
+    render(lon0);
+
+    if (prefersReduced) return;
+
+    const DEG_PER_SEC = 7;
+    let last = performance.now();
+    let running = true;
+
+    function tick(now) {
+      const dt = (now - last) / 1000;
+      last = now;
+      lon0 = (lon0 + DEG_PER_SEC * dt) % 360;
+      render(lon0);
+      if (running) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    const section = document.getElementById("reach");
+    if (section && "IntersectionObserver" in window) {
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const wasRunning = running;
+            running = entry.isIntersecting;
+            if (running && !wasRunning) {
+              last = performance.now();
+              requestAnimationFrame(tick);
+            }
+          });
+        },
+        { threshold: 0.1 }
+      ).observe(section);
+    }
   })();
 
   /* ---------------------------------------------------------------- */

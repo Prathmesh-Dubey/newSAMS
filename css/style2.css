@@ -144,35 +144,33 @@ svg{ width: 100%; height: 100%; }
 /* Navbar                                                                  */
 /* ---------------------------------------------------------------------- */
 .s2-nav{
-  position: fixed; top: 16px; left: 0; right: 0; z-index: 200;
-  display: flex; justify-content: center;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
 }
 .s2-nav__bar{
-  width: min(1440px, calc(100% - 24px));
-  display: flex; align-items: center; justify-content: space-between; gap: 24px;
-  background: rgba(255,255,255,.72);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  border: 1px solid rgba(255,255,255,.6);
-  border-radius: 100px;
-  padding: 10px 12px 10px 20px;
-  box-shadow: 0 8px 30px rgba(15,40,70,.08);
-  transition: all .45s var(--ease);
+  width: 100%;
+  display: flex; align-items: center; justify-content: space-between; gap: 32px;
+  background: rgba(255,255,255,.82);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(255,255,255,.5);
+  padding: 22px 44px;
+  box-shadow: 0 8px 30px rgba(15,40,70,.06);
+  transition: all .4s var(--ease);
 }
 .s2-nav.is-scrolled .s2-nav__bar{
-  background: rgba(255,255,255,.92);
+  background: rgba(255,255,255,.96);
   box-shadow: 0 14px 40px rgba(15,40,70,.14);
-  border-color: var(--border);
-  padding-top: 8px; padding-bottom: 8px;
+  border-bottom-color: var(--border);
+  padding-top: 15px; padding-bottom: 15px;
 }
-.s2-nav__logo{ display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.s2-nav__logo img{ height: 26px; width: auto; }
-.s2-nav__logo-text{ font-family: var(--font-head); font-weight: 700; font-size: 15px; color: var(--navy); }
+.s2-nav__logo{ display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.s2-nav__logo img{ height: 36px; width: auto; }
+.s2-nav__logo-text{ font-family: var(--font-head); font-weight: 700; font-size: 19px; color: var(--navy); }
 .s2-nav__logo-text em{ font-style: normal; color: var(--sky-deep); }
 
-.s2-nav__links{ display: flex; align-items: center; gap: 4px; }
+.s2-nav__links{ display: flex; align-items: center; gap: 6px; }
 .s2-nav__links a{
-  position: relative; padding: 10px 16px; border-radius: 100px; font-size: 14.5px; font-weight: 600;
+  position: relative; padding: 12px 20px; border-radius: 100px; font-size: 15.5px; font-weight: 600;
   color: var(--gray-dark); transition: color .3s var(--ease), background .3s var(--ease);
 }
 .s2-nav__links a span{ position: relative; }
@@ -183,11 +181,12 @@ svg{ width: 100%; height: 100%; }
 .s2-nav__links a:hover{ color: var(--navy); background: var(--ice-2); }
 .s2-nav__links a:hover span::after{ transform: scaleX(1); }
 
-.s2-nav__actions{ display: flex; align-items: center; gap: 12px; }
+.s2-nav__actions{ display: flex; align-items: center; gap: 16px; }
 .s2-nav__status{
-  display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 600; color: var(--gray);
-  padding: 8px 14px; background: var(--ice-2); border-radius: 100px; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--gray);
+  padding: 10px 18px; background: var(--ice-2); border-radius: 100px; white-space: nowrap;
 }
+.s2-nav .s2-btn--sm{ padding: 12px 22px; font-size: 14.5px; }
 .s2-nav__toggle{
   display: none; flex-direction: column; justify-content: center; gap: 5px;
   width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--border-strong); background: #fff;
@@ -199,7 +198,7 @@ svg{ width: 100%; height: 100%; }
 
 .s2-nav__mobile{
   display: none; flex-direction: column; gap: 4px;
-  position: fixed; top: 82px; left: 16px; right: 16px; z-index: 199;
+  position: fixed; top: 86px; left: 16px; right: 16px; z-index: 199;
   background: #fff; border-radius: 22px; padding: 14px; box-shadow: var(--shadow-lg); border: 1px solid var(--border);
   transform: translateY(-12px); opacity: 0; pointer-events: none; transition: all .35s var(--ease);
 }
@@ -209,6 +208,7 @@ svg{ width: 100%; height: 100%; }
 .s2-nav__mobile .s2-btn{ margin-top: 6px; }
 
 @media (max-width: 980px){
+  .s2-nav__bar{ padding: 16px 20px; }
   .s2-nav__links, .s2-nav__status{ display: none; }
   .s2-nav__actions > .s2-btn{ display: none; }
   .s2-nav__toggle{ display: flex; }

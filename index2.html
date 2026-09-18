@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style2.css">
+<script type="module" src="https://unpkg.com/@google/model-viewer@3.5.0/dist/model-viewer.min.js"></script>
 </head>
 <body>
 
@@ -239,22 +240,40 @@
 
     <!-- ============ CERTIFICATION BELT (GLOBAL COMPLIANCE) ============ -->
     <section class="s2-belt" id="certifications" aria-label="Global compliance">
-      <div class="s2-wrap">
-        <span class="s2-eyebrow s2-eyebrow--onnavy"><span class="s2-eyebrow__dot"></span>Global Compliance</span>
+      <div class="s2-wrap s2-belt__inner">
+        <span class="s2-eyebrow s2-eyebrow--onnavy s2-belt__label"><span class="s2-eyebrow__dot"></span>Global Compliance</span>
 
-        <div class="s2-belt__grid">
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/atex.png" alt="">ATEX 2014/34/EU</span>
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/nec-500.png" alt="">NEC 500 Class I Div 1</span>
-          <span class="s2-belt__item" data-reveal><i></i>IP68</span>
-          <span class="s2-belt__item" data-reveal><i></i>MIL&#8209;STD&#8209;810H</span>
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/qualcomm-snapdragon.png" alt="">Qualcomm Snapdragon</span>
-          <span class="s2-belt__item" data-reveal><i></i>Zone 1 &middot; Zone 21</span>
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/android-enterprise.png" alt="">Android 16</span>
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/iecex.png" alt="">IECEx</span>
-          <span class="s2-belt__item" data-reveal><img src="img/cretLogos/peso.png" alt="">PESO</span>
-          <span class="s2-belt__item" data-reveal><i></i>Ex ib IIC T4</span>
-          <span class="s2-belt__item" data-reveal><i></i>T&Uuml;V Germany</span>
-          <span class="s2-belt__item" data-reveal><i></i>Q4 2026 Launch</span>
+        <div class="s2-belt__viewport" data-reveal>
+          <div class="s2-belt__track" aria-hidden="false">
+            <div class="s2-belt__grid">
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/atex.png" alt="ATEX" loading="lazy"></span>ATEX 2014/34/EU</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/nec-500.png" alt="NEC 500" loading="lazy"></span>NEC 500 Class I Div 1</span>
+              <span class="s2-belt__item"><i></i>IP68</span>
+              <span class="s2-belt__item"><i></i>MIL&#8209;STD&#8209;810H</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/qualcomm-snapdragon.png" alt="Qualcomm Snapdragon" loading="lazy"></span>Qualcomm Snapdragon</span>
+              <span class="s2-belt__item"><i></i>Zone 1 &middot; Zone 21</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/android-enterprise.png" alt="Android Enterprise" loading="lazy"></span>Android 16</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/iecex.png" alt="IECEx" loading="lazy"></span>IECEx</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/peso.png" alt="PESO" loading="lazy"></span>PESO</span>
+              <span class="s2-belt__item"><i></i>Ex ib IIC T4</span>
+              <span class="s2-belt__item"><i></i>T&Uuml;V Germany</span>
+              <span class="s2-belt__item"><i></i>Q4 2026 Launch</span>
+            </div>
+            <div class="s2-belt__grid" aria-hidden="true">
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/atex.png" alt="" loading="lazy"></span>ATEX 2014/34/EU</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/nec-500.png" alt="" loading="lazy"></span>NEC 500 Class I Div 1</span>
+              <span class="s2-belt__item"><i></i>IP68</span>
+              <span class="s2-belt__item"><i></i>MIL&#8209;STD&#8209;810H</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/qualcomm-snapdragon.png" alt="" loading="lazy"></span>Qualcomm Snapdragon</span>
+              <span class="s2-belt__item"><i></i>Zone 1 &middot; Zone 21</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/android-enterprise.png" alt="" loading="lazy"></span>Android 16</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/iecex.png" alt="" loading="lazy"></span>IECEx</span>
+              <span class="s2-belt__item"><span class="s2-belt__logo"><img src="img/cretLogos/peso.png" alt="" loading="lazy"></span>PESO</span>
+              <span class="s2-belt__item"><i></i>Ex ib IIC T4</span>
+              <span class="s2-belt__item"><i></i>T&Uuml;V Germany</span>
+              <span class="s2-belt__item"><i></i>Q4 2026 Launch</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -271,7 +290,25 @@
         <div class="s2-tov__stage">
           <div class="s2-tov__visual">
             <div class="s2-tov__glow" aria-hidden="true"></div>
-            <div class="s2-tov__phone" id="tovPhoneStage2"></div>
+            <model-viewer
+              id="tovModel2"
+              class="s2-tov__model"
+              src="3Dmodel/sams-rugged-phone.glb"
+              poster="img/m360/front.webp"
+              alt="SAMS EX-04Z1 rugged smartphone 3D model"
+              camera-controls
+              touch-action="pan-y"
+              auto-rotate
+              auto-rotate-delay="0"
+              rotation-per-second="18deg"
+              interaction-prompt="none"
+              camera-orbit="0deg 75deg 105%"
+              min-camera-orbit="auto 8deg auto"
+              max-camera-orbit="auto 172deg auto"
+              shadow-intensity="1"
+              exposure="1.05"
+              disable-zoom
+            ></model-viewer>
             <span class="s2-tov__badge" id="tovBadge2"></span>
           </div>
 
@@ -449,11 +486,11 @@
 
           <div class="s2-reach__right" data-reveal>
             <div class="s2-reach__regions" role="tablist" aria-label="Regions" id="s2Regions">
-              <button type="button" class="s2-region is-active" role="tab" aria-selected="true" data-region="me"><span>Middle East</span><span>9</span></button>
-              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="eu"><span>Europe</span><span>21</span></button>
-              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="am"><span>Americas</span><span>4</span></button>
-              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="apac"><span>Asia Pacific</span><span>6</span></button>
-              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="afcis"><span>Africa &amp; CIS</span><span>1</span></button>
+              <button type="button" class="s2-region is-active" role="tab" aria-selected="true" data-region="me"><span>Middle East</span></button>
+              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="eu"><span>Europe</span></button>
+              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="am"><span>Americas</span></button>
+              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="apac"><span>Asia Pacific</span></button>
+              <button type="button" class="s2-region" role="tab" aria-selected="false" data-region="afcis"><span>Africa &amp; CIS</span></button>
             </div>
 
             <div class="s2-reach__countries" id="s2Countries">

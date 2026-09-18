@@ -168,18 +168,18 @@ document.addEventListener("DOMContentLoaded", function () {
   (function techOverview() {
     const tabsWrap = document.getElementById("tovTabs2");
     const body = document.getElementById("tovBody2");
-    const phoneStage = document.getElementById("tovPhoneStage2");
+    const model = document.getElementById("tovModel2");
     const badgeEl = document.getElementById("tovBadge2");
     const section = document.getElementById("device");
-    if (!tabsWrap || !body || !phoneStage || !badgeEl || !section) return;
+    if (!tabsWrap || !body || !model || !badgeEl || !section) return;
 
-    const ANGLES = {
-      front: "img/phone-front.webp",
-      back: "img/phone-back-clean.webp",
-      top: "img/phone-top.webp",
-      bottom: "img/phone-bottom.webp",
-      left: "img/phone-left.webp",
-      right: "img/phone-right.webp",
+    const ORBITS = {
+      front: "0deg 75deg 105%",
+      back: "180deg 75deg 105%",
+      top: "0deg 12deg 105%",
+      bottom: "0deg 168deg 105%",
+      left: "-90deg 75deg 105%",
+      right: "90deg 75deg 105%",
     };
 
     const SPECS = [
@@ -201,15 +201,15 @@ document.addEventListener("DOMContentLoaded", function () {
         details: [{ label: "Ingress", value: "IP68 rated" }, { label: "Sealing", value: "Ports, keys and speaker" }], badge: "IP68" },
     ];
 
-    Object.entries(ANGLES).forEach(([angle, src]) => {
-      const img = document.createElement("img");
-      img.dataset.angle = angle;
-      img.src = src;
-      img.alt = "SAMS EX-04Z1 — " + angle + " view";
-      if (angle === SPECS[0].image) img.classList.add("is-active");
-      phoneStage.appendChild(img);
-    });
-    const phoneImgs = Array.from(phoneStage.querySelectorAll("img"));
+    let resumeTimer = null;
+    function goToAngle(angle) {
+      const orbit = ORBITS[angle];
+      if (!orbit) return;
+      model.removeAttribute("auto-rotate");
+      model.cameraOrbit = orbit;
+      if (resumeTimer) clearTimeout(resumeTimer);
+      resumeTimer = setTimeout(() => model.setAttribute("auto-rotate", ""), 3200);
+    }
 
     SPECS.forEach((spec, i) => {
       const tab = document.createElement("button");
@@ -229,7 +229,7 @@ document.addEventListener("DOMContentLoaded", function () {
         t.classList.toggle("is-active", i === index);
         t.setAttribute("aria-selected", String(i === index));
       });
-      phoneImgs.forEach((img) => img.classList.toggle("is-active", img.dataset.angle === spec.image));
+      goToAngle(spec.image);
 
       if (spec.badge) {
         badgeEl.textContent = spec.badge;

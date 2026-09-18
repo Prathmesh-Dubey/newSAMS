@@ -338,21 +338,58 @@ svg{ width: 100%; height: 100%; }
 /* ---------------------------------------------------------------------- */
 /* Certification belt / marquee                                           */
 /* ---------------------------------------------------------------------- */
-.s2-belt{ padding: 70px 0; background: var(--navy); }
-.s2-belt .s2-eyebrow{ margin-bottom: 30px; }
-.s2-belt__grid{ display: flex; flex-wrap: wrap; gap: 16px; }
+.s2-belt{ padding: 22px 0; background: var(--navy); overflow: hidden; }
+.s2-belt__inner{ display: flex; align-items: center; gap: 24px; }
+.s2-belt .s2-eyebrow{ margin: 0; }
+.s2-belt__label{ flex-shrink: 0; white-space: nowrap; }
+
+.s2-belt__viewport{
+  position: relative; overflow: hidden; width: 100%; flex: 1 1 auto; min-width: 0;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 40px, #000 calc(100% - 40px), transparent 100%);
+}
+.s2-belt__track{
+  display: flex; width: max-content;
+  animation: s2-belt-scroll 30s linear infinite;
+}
+.s2-belt__viewport:hover .s2-belt__track{ animation-play-state: paused; }
+.s2-belt__grid{ display: flex; flex-wrap: nowrap; gap: 10px; padding-right: 10px; flex-shrink: 0; }
+
 .s2-belt__item{
-  display: flex; align-items: center; gap: 12px; white-space: nowrap;
+  display: flex; align-items: center; gap: 8px; white-space: nowrap;
   background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.12);
-  padding: 16px 26px; border-radius: 100px; color: #e4edf9; font-size: 17px; font-weight: 700;
+  padding: 7px 16px 7px 8px; border-radius: 100px; color: #e4edf9; font-size: 13px; font-weight: 700;
   transition: background .3s var(--ease), border-color .3s var(--ease), transform .3s var(--ease);
 }
 .s2-belt__item:hover{ background: rgba(47,143,239,.16); border-color: var(--sky); transform: translateY(-2px); }
-.s2-belt__item img{ height: 20px; width: auto; filter: brightness(0) invert(1); opacity: .9; }
-.s2-belt__item i{ width: 7px; height: 7px; border-radius: 50%; background: var(--sky-2); flex-shrink: 0; }
+.s2-belt__logo{
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 30px; height: 22px; background: #fff; border-radius: 6px; padding: 3px 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+}
+.s2-belt__item img{ max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.s2-belt__item i{ width: 6px; height: 6px; border-radius: 50%; background: var(--sky-2); flex-shrink: 0; }
+
+@keyframes s2-belt-scroll{
+  from{ transform: translateX(0); }
+  to{ transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .s2-belt__track{ animation: none; }
+}
+
+@media (max-width: 780px){
+  .s2-belt__inner{ flex-direction: column; align-items: flex-start; gap: 12px; }
+  .s2-belt__viewport{ width: 100%; }
+}
 
 @media (max-width: 640px){
-  .s2-belt__item{ font-size: 15px; padding: 13px 20px; }
+  .s2-belt__item{ font-size: 12px; padding: 6px 14px 6px 6px; }
+  .s2-belt__viewport{
+    -webkit-mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%);
+  }
 }
 
 /* ---------------------------------------------------------------------- */
@@ -369,13 +406,11 @@ svg{ width: 100%; height: 100%; }
 }
 .s2-tov__visual{ position: relative; display: flex; align-items: center; justify-content: center; min-height: 420px; }
 .s2-tov__glow{ position: absolute; width: 320px; height: 320px; background: radial-gradient(circle, var(--sky-2), transparent 70%); opacity: .35; filter: blur(40px); }
-.s2-tov__phone{ position: relative; width: 240px; height: 380px; }
-.s2-tov__phone img{
-  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
-  opacity: 0; transform: scale(.94) rotate(-2deg); transition: opacity .55s var(--ease), transform .55s var(--ease);
+.s2-tov__model{
+  position: relative; width: 100%; height: 420px; max-width: 340px;
+  --poster-color: transparent; background-color: transparent;
   filter: drop-shadow(0 30px 40px rgba(10,30,55,.18));
 }
-.s2-tov__phone img.is-active{ opacity: 1; transform: scale(1) rotate(0deg); }
 .s2-tov__badge{
   position: absolute; bottom: 14px; right: 14px; background: var(--navy); color: #fff;
   font-family: var(--font-head); font-weight: 700; font-size: 14px; padding: 8px 16px; border-radius: 100px;
@@ -555,9 +590,7 @@ svg{ width: 100%; height: 100%; }
   display: flex; align-items: center; gap: 8px; background: var(--ice-2); border: none; border-radius: 100px;
   padding: 10px 16px; font-weight: 700; font-size: 13px; color: var(--gray-dark); transition: all .3s var(--ease);
 }
-.s2-region span:last-child{ background: rgba(0,0,0,.08); border-radius: 100px; padding: 1px 7px; font-size: 11px; }
 .s2-region.is-active{ background: var(--navy); color: #fff; }
-.s2-region.is-active span:last-child{ background: var(--sky); color: #fff; }
 .s2-region:hover:not(.is-active){ background: var(--ice); }
 
 .s2-country-panel{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }

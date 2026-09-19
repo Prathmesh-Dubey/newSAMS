@@ -9,21 +9,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!section || !carousel || !track || !dotsWrap || !prevBtn || !nextBtn || !phoneStage) return;
 
-  const ANGLES = {
-    front: "img/phone-front.webp",
-    back: "img/phone-back-clean.webp",
-    top: "img/phone-top.webp",
-    bottom: "img/phone-bottom.webp",
-    left: "img/phone-left.webp",
-    right: "img/phone-right.webp",
-  };
-
   const SPECS = [
     {
       eyebrow: "Design",
       title: "Rugged Engineering",
       desc: "Built for demanding industrial environments with reinforced construction and protected controls.",
-      image: "front",
+      view: "front",
       details: [
         { label: "Material", value: "Industrial-grade housing" },
         { label: "Controls", value: "Sealed, glove-operable" },
@@ -33,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Display",
       title: "Industrial Visibility",
       desc: "Large readable display engineered for field operation and professional workflows.",
-      image: "front",
+      view: "front",
       details: [
         { label: "Visibility", value: "Sunlight-readable panel" },
         { label: "Input", value: "Glove and wet-touch capable" },
@@ -43,7 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Performance",
       title: "Qualcomm Snapdragon",
       desc: "8-core Snapdragon platform designed for enterprise applications, communication and field workflows.",
-      image: "right",
+      view: "right",
       details: [
         { label: "Processor", value: "8-core Qualcomm Snapdragon" },
         { label: "OS", value: "Android 16, Enterprise-managed" },
@@ -53,7 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Camera",
       title: "50 MP Inspection Camera",
       desc: "High-resolution rear camera with phase-detect autofocus and LED flash for industrial inspection.",
-      image: "back",
+      view: "back",
       details: [
         { label: "Rear camera", value: "50 MP" },
         { label: "Focus", value: "Phase-detect AF + LED flash" },
@@ -64,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Battery",
       title: "4,000 mAh",
       desc: "Full-shift battery capacity with intrinsically safe charging circuitry and low-temperature operation.",
-      image: "bottom",
+      view: "bottom",
       details: [
         { label: "Capacity", value: "4,000 mAh" },
         { label: "Charging", value: "Intrinsically safe circuitry" },
@@ -75,7 +66,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Connectivity",
       title: "Connected In The Field",
       desc: "4G LTE, dual-band Wi-Fi and Bluetooth for PTT, telemetry and asset tagging via NFC.",
-      image: "top",
+      view: "top",
       details: [
         { label: "Network", value: "4G LTE" },
         { label: "Wireless", value: "Wi-Fi · Bluetooth · NFC" },
@@ -85,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Navigation",
       title: "Multi-Constellation GNSS",
       desc: "Four-constellation positioning for lone-worker safety and geofenced zone alerts.",
-      image: "left",
+      view: "left",
       details: [
         { label: "GNSS", value: "GPS · GLONASS" },
         { label: "Use", value: "Lone-worker safety, geofencing" },
@@ -95,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () {
       eyebrow: "Protection",
       title: "IP68",
       desc: "Fully dust-tight and protected against continuous immersion.",
-      image: "front",
+      view: "front",
       details: [
         { label: "Ingress", value: "IP68 rated" },
         { label: "Sealing", value: "Ports, keys and speaker" },
@@ -105,18 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   const pad2 = (n) => String(n).padStart(2, "0");
-
-  // Phone visual: a fixed crossfade stack, independent of the text swipe.
-  Object.entries(ANGLES).forEach(([angle, src]) => {
-    const img = document.createElement("img");
-    img.className = "tov-phone-img";
-    img.dataset.angle = angle;
-    img.src = src;
-    img.alt = "SAMS EX-04Z1 — " + angle + " view";
-    if (angle === SPECS[0].image) img.classList.add("is-active");
-    phoneStage.appendChild(img);
-  });
-  const phoneImgs = Array.from(phoneStage.querySelectorAll(".tov-phone-img"));
 
   const badgeEl = document.createElement("span");
   badgeEl.className = "tov-slide-badge";
@@ -173,9 +152,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function markActive(index) {
     dots.forEach((d, i) => d.classList.toggle("is-active", i === index));
     slides.forEach((s, i) => s.classList.toggle("is-active", i === index));
-    phoneImgs.forEach((img) =>
-      img.classList.toggle("is-active", img.dataset.angle === SPECS[index].image)
-    );
+    if (window.tovModel) window.tovModel.setView(SPECS[index].view);
     if (SPECS[index].badge) {
       badgeEl.textContent = SPECS[index].badge;
       badgeEl.classList.add("is-visible");
@@ -272,4 +249,10 @@ document.addEventListener("DOMContentLoaded", function () {
   window.addEventListener("resize", () => goTo(currentIndex));
 
   markActive(0);
+
+  // tovModel.js loads as a module and may finish setting up after this
+  // script runs, so re-apply the active spec's view once it's ready.
+  window.addEventListener("tov:model-ready", () => {
+    if (window.tovModel) window.tovModel.setView(SPECS[currentIndex].view);
+  });
 });

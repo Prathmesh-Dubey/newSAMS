@@ -72,10 +72,6 @@
         Americas and Asia. Certification is underway with T&Uuml;V in Germany, ahead of the Q4 2026 launch.
       </p>
     </div>
-
-    <div class="hero-3d" id="hero3d">
-      <canvas id="phone-canvas"></canvas>
-    </div>
   </section>
 
   <section class="stats-strip">
@@ -370,6 +366,12 @@
         <div class="tov-visual" id="tovVisual">
           <div class="tov-visual-glow" aria-hidden="true"></div>
           <div class="tov-phone-stage" id="tovPhoneStage"></div>
+          <button class="tov-360-btn" id="tov360Btn" type="button" aria-label="Open full 360° model view">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M9 3H5a2 2 0 0 0-2 2v4M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M15 21h4a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>Drag to rotate &middot; 360&deg;</span>
+          </button>
         </div>
 
         <div class="tov-carousel" id="tovCarousel" tabindex="0">
@@ -680,8 +682,20 @@
     </div>
   </footer>
 
+  <div class="tov-3d-modal" id="tov3dModal" aria-hidden="true">
+    <div class="tov-3d-modal-backdrop" id="tov3dModalBackdrop"></div>
+    <div class="tov-3d-modal-panel" role="dialog" aria-modal="true" aria-label="SAMS EX-04Z1 360 degree model view">
+      <button class="tov-3d-modal-close" id="tov3dModalClose" type="button" aria-label="Close 360 view">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="tov-3d-modal-stage" id="tov3dModalStage"></div>
+      <span class="tov-3d-modal-hint">Drag to rotate &middot; Scroll or pinch to zoom</span>
+    </div>
+  </div>
+
   <script src="js/main.js"></script>
-  <script type="module" src="js/hero3d.js"></script>
+  <script type="module" src="js/tovModel.js"></script>
+  <script type="module" src="js/tov3dModal.js"></script>
   <script src="js/carousel.js"></script>
   <script src="js/techOverview.js"></script>
   <script src="js/featuredProduct.js"></script>

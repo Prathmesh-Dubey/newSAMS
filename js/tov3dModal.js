@@ -37,10 +37,14 @@ function initTov3dModal() {
   }
 
   function open() {
-    ensureViewer();
+    // Show the modal first: createPhoneViewer measures the stage's
+    // clientWidth/clientHeight to size the camera and renderer, and while
+    // the modal is display:none that measures 0x0, leaving the model framed
+    // at an invalid (NaN) distance and the canvas blank forever after.
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("tov-modal-locked");
+    ensureViewer();
     requestAnimationFrame(() => viewer.resize());
   }
 

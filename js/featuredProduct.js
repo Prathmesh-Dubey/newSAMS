@@ -3,8 +3,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const cardsWrap = document.getElementById("fpCards");
   const certsWrap = document.getElementById("fpCerts");
   const calloutsWrap = document.getElementById("fpCallouts");
+  const facesWrap = document.getElementById("fpFaces");
 
-  if (!section || !cardsWrap || !certsWrap || !calloutsWrap) return;
+  if (!section || !cardsWrap || !certsWrap || !calloutsWrap || !facesWrap) return;
 
   const ICONS = {
     android:
@@ -25,6 +26,45 @@ document.addEventListener("DOMContentLoaded", function () {
   ];
 
   const CERTS = ["ATEX Certified", "IECEx Certified", "NEC 500", "IMEI / TAC Certified"];
+
+  const FACES = [
+    {
+      num: "01",
+      label: "Front",
+      view: "front",
+      desc: "Glove-capable touchscreen with Ex marking and front camera.",
+    },
+    {
+      num: "02",
+      label: "Rear",
+      view: "back",
+      desc: "50 MP AI camera, speaker grille and certification plate.",
+    },
+    {
+      num: "03",
+      label: "Left",
+      view: "left",
+      desc: "Volume keys and programmable side key.",
+    },
+    {
+      num: "04",
+      label: "Right",
+      view: "right",
+      desc: "Sealed side port and label recess.",
+    },
+    {
+      num: "05",
+      label: "Top",
+      view: "top",
+      desc: "Dedicated red SOS key beside the power key.",
+    },
+    {
+      num: "06",
+      label: "Bottom",
+      view: "bottom",
+      desc: "Sealed USB charging port and lanyard anchor.",
+    },
+  ];
 
   const CALLOUTS = [
     { label: "Built for", value: "Extreme Environments", side: "right", top: "18%" },
@@ -53,6 +93,27 @@ document.addEventListener("DOMContentLoaded", function () {
     el.style.transitionDelay = 0.65 + 0.06 * i + "s";
     el.textContent = label;
     certsWrap.appendChild(el);
+  });
+
+  FACES.forEach((face, i) => {
+    const el = document.createElement("button");
+    el.type = "button";
+    el.className = "fp-face-card";
+    el.style.transitionDelay = 0.4 + 0.06 * i + "s";
+    el.innerHTML =
+      '<span class="fp-face-top"><span class="fp-face-num">' +
+      face.num +
+      '</span><span class="fp-face-dot">&middot;</span><span class="fp-face-label">' +
+      face.label.toUpperCase() +
+      '</span></span><span class="fp-face-desc">' +
+      face.desc +
+      "</span>";
+    el.addEventListener("click", () => {
+      const device = document.getElementById("device");
+      if (window.tovModel) window.tovModel.setView(face.view);
+      if (device) device.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+    facesWrap.appendChild(el);
   });
 
   CALLOUTS.forEach((co, i) => {

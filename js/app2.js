@@ -163,150 +163,38 @@ document.addEventListener("DOMContentLoaded", function () {
   })();
 
   /* ---------------------------------------------------------------- */
-  /* Technical Overview: interactive category system                   */
+  /* 360 / 3D zoom viewer modal (Technical Overview + Product page)    */
   /* ---------------------------------------------------------------- */
-  (function techOverview() {
-    const tabsWrap = document.getElementById("tovTabs2");
-    const body = document.getElementById("tovBody2");
-    const image = document.getElementById("tovImage2");
-    const badgeEl = document.getElementById("tovBadge2");
-    const section = document.getElementById("device");
-    if (!tabsWrap || !body || !image || !badgeEl || !section) return;
-
-    const IMAGES = {
-      front: "img/m360/front.webp",
-      back: "img/m360/back.webp",
-      top: "img/m360/top.webp",
-      bottom: "img/m360/bottom.webp",
-      left: "img/m360/left.webp",
-      right: "img/m360/right.webp",
-    };
-
-    const SPECS = [
-      { eyebrow: "Design", title: "Rugged Engineering", desc: "Built for demanding industrial environments with reinforced construction and protected controls.", image: "front",
-        details: [{ label: "Material", value: "Industrial-grade housing" }, { label: "Controls", value: "Sealed, glove-operable" }] },
-      { eyebrow: "Display", title: "Industrial Visibility", desc: "Large readable display engineered for field operation and professional workflows.", image: "front",
-        details: [{ label: "Visibility", value: "Sunlight-readable panel" }, { label: "Input", value: "Glove and wet-touch capable" }] },
-      { eyebrow: "Performance", title: "Qualcomm Snapdragon", desc: "8-core Snapdragon platform designed for enterprise applications, communication and field workflows.", image: "right",
-        details: [{ label: "Processor", value: "8-core Qualcomm Snapdragon" }, { label: "OS", value: "Android 16, Enterprise-managed" }] },
-      { eyebrow: "Camera", title: "50 MP Inspection Camera", desc: "High-resolution rear camera with phase-detect autofocus and LED flash for industrial inspection.", image: "back",
-        details: [{ label: "Rear camera", value: "50 MP" }, { label: "Focus", value: "Phase-detect AF + LED flash" }], badge: "50 MP" },
-      { eyebrow: "Battery", title: "4,000 mAh", desc: "Full-shift battery capacity with intrinsically safe charging circuitry and low-temperature operation.", image: "bottom",
-        details: [{ label: "Capacity", value: "4,000 mAh" }, { label: "Charging", value: "Intrinsically safe circuitry" }], badge: "4,000 mAh" },
-      { eyebrow: "Connectivity", title: "Connected In The Field", desc: "4G LTE, dual-band Wi-Fi and Bluetooth for PTT, telemetry and asset tagging via NFC.", image: "top",
-        details: [{ label: "Network", value: "4G LTE" }, { label: "Wireless", value: "Wi-Fi · Bluetooth · NFC" }] },
-      { eyebrow: "Navigation", title: "Multi-Constellation GNSS", desc: "Four-constellation positioning for lone-worker safety and geofenced zone alerts.", image: "left",
-        details: [{ label: "GNSS", value: "GPS · GLONASS" }, { label: "Use", value: "Lone-worker safety, geofencing" }] },
-      { eyebrow: "Protection", title: "IP68", desc: "Fully dust-tight and protected against continuous immersion.", image: "front",
-        details: [{ label: "Ingress", value: "IP68 rated" }, { label: "Sealing", value: "Ports, keys and speaker" }], badge: "IP68" },
-    ];
-
-    function goToAngle(angle) {
-      const src = IMAGES[angle];
-      if (!src || image.getAttribute("src") === src) return;
-      image.style.opacity = "0";
-      window.setTimeout(() => {
-        image.src = src;
-        image.style.opacity = "1";
-      }, 150);
-    }
-
-    SPECS.forEach((spec, i) => {
-      const tab = document.createElement("button");
-      tab.type = "button";
-      tab.className = "s2-tov__tab" + (i === 0 ? " is-active" : "");
-      tab.textContent = spec.eyebrow;
-      tab.setAttribute("role", "tab");
-      tab.setAttribute("aria-selected", String(i === 0));
-      tab.addEventListener("click", () => show(i));
-      tabsWrap.appendChild(tab);
-    });
-    const tabs = Array.from(tabsWrap.children);
-
-    function show(index) {
-      const spec = SPECS[index];
-      tabs.forEach((t, i) => {
-        t.classList.toggle("is-active", i === index);
-        t.setAttribute("aria-selected", String(i === index));
-      });
-      goToAngle(spec.image);
-
-      if (spec.badge) {
-        badgeEl.textContent = spec.badge;
-        badgeEl.classList.add("is-visible");
-      } else {
-        badgeEl.classList.remove("is-visible");
-      }
-
-      const details = spec.details
-        .map(
-          (d) =>
-            '<div class="s2-tov__detail"><span>' + d.label + "</span><span>" + d.value + "</span></div>"
-        )
-        .join("");
-
-      body.innerHTML =
-        '<div class="s2-tov__slide">' +
-        '<span class="s2-tov__num">' + String(index + 1).padStart(2, "0") + " / " + String(SPECS.length).padStart(2, "0") + "</span>" +
-        "<h3>" + spec.title + "</h3>" +
-        "<p>" + spec.desc + "</p>" +
-        '<div class="s2-tov__details">' + details + "</div>" +
-        "</div>";
-    }
-
-    show(0);
-
-    let inView = false;
-    new IntersectionObserver((entries) => entries.forEach((e) => (inView = e.isIntersecting)), { threshold: 0.3 }).observe(section);
-    let current = 0;
-    tabs.forEach((t, i) =>
-      t.addEventListener("click", () => {
-        current = i;
-      })
-    );
-    window.addEventListener("keydown", (e) => {
-      if (!inView) return;
-      if (e.key === "ArrowRight") {
-        e.preventDefault();
-        current = (current + 1) % SPECS.length;
-        show(current);
-      } else if (e.key === "ArrowLeft") {
-        e.preventDefault();
-        current = (current - 1 + SPECS.length) % SPECS.length;
-        show(current);
-      }
-    });
-
-    /* 360 / 3D zoom modal */
+  (function tov360() {
     const openBtn = document.getElementById("tov360Btn2");
     const modal = document.getElementById("tov360Modal2");
     const backdrop = document.getElementById("tov360Backdrop2");
     const closeBtn = document.getElementById("tov360Close2");
     const modalModel = document.getElementById("tov360Model2");
-    if (openBtn && modal && backdrop && closeBtn) {
-      let lastFocused = null;
+    if (!openBtn || !modal || !backdrop || !closeBtn) return;
 
-      function openModal() {
-        lastFocused = document.activeElement;
-        modal.hidden = false;
-        document.body.style.overflow = "hidden";
-        if (modalModel) modalModel.cameraOrbit = "0deg 75deg 105%";
-        closeBtn.focus();
-      }
+    let lastFocused = null;
 
-      function closeModal() {
-        modal.hidden = true;
-        document.body.style.overflow = "";
-        if (lastFocused) lastFocused.focus();
-      }
-
-      openBtn.addEventListener("click", openModal);
-      closeBtn.addEventListener("click", closeModal);
-      backdrop.addEventListener("click", closeModal);
-      window.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !modal.hidden) closeModal();
-      });
+    function openModal() {
+      lastFocused = document.activeElement;
+      modal.hidden = false;
+      document.body.style.overflow = "hidden";
+      if (modalModel) modalModel.cameraOrbit = "0deg 75deg 105%";
+      closeBtn.focus();
     }
+
+    function closeModal() {
+      modal.hidden = true;
+      document.body.style.overflow = "";
+      if (lastFocused) lastFocused.focus();
+    }
+
+    openBtn.addEventListener("click", openModal);
+    closeBtn.addEventListener("click", closeModal);
+    backdrop.addEventListener("click", closeModal);
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !modal.hidden) closeModal();
+    });
   })();
 
   /* ---------------------------------------------------------------- */

@@ -451,10 +451,11 @@ svg{ width: 100%; height: 100%; }
 }
 .s2-tov__visual{ position: relative; display: flex; align-items: center; justify-content: center; min-height: 420px; }
 .s2-tov__glow{ position: absolute; width: 320px; height: 320px; background: radial-gradient(circle, var(--sky-2), transparent 70%); opacity: .35; filter: blur(40px); }
-.s2-tov__model{
+.s2-tov__image{
   position: relative; width: 100%; height: 420px; max-width: 340px;
-  --poster-color: transparent; background-color: transparent;
+  object-fit: contain;
   filter: drop-shadow(0 30px 40px rgba(10,30,55,.18));
+  transition: opacity .25s var(--ease), transform .3s var(--ease);
 }
 .s2-tov__badge{
   position: absolute; bottom: 14px; right: 14px; background: var(--navy); color: #fff;
@@ -462,6 +463,47 @@ svg{ width: 100%; height: 100%; }
   opacity: 0; transform: translateY(8px); transition: all .4s var(--ease); box-shadow: var(--shadow-md);
 }
 .s2-tov__badge.is-visible{ opacity: 1; transform: none; }
+
+.s2-tov__360{
+  position: absolute; top: 14px; right: 14px; display: flex; align-items: center; gap: 7px;
+  background: #fff; color: var(--navy); border: 1.5px solid var(--border);
+  font-family: var(--font-head); font-weight: 700; font-size: 13px; letter-spacing: .01em;
+  padding: 9px 15px 9px 12px; border-radius: 100px; box-shadow: var(--shadow-md);
+  transition: all .25s var(--ease); cursor: pointer;
+}
+.s2-tov__360 svg{ width: 17px; height: 17px; flex-shrink: 0; }
+.s2-tov__360:hover{ background: var(--navy); color: #fff; border-color: var(--navy); transform: translateY(-1px); }
+.s2-tov__360:focus-visible{ outline: 2px solid var(--sky-deep); outline-offset: 2px; }
+
+/* ---- 360 / 3D zoom viewer modal ---- */
+.s2-tov3d{ position: fixed; inset: 0; z-index: 999; display: flex; align-items: center; justify-content: center; padding: 24px; }
+.s2-tov3d[hidden]{ display: none; }
+.s2-tov3d__backdrop{ position: absolute; inset: 0; background: rgba(8,18,32,.72); backdrop-filter: blur(4px); }
+.s2-tov3d__panel{
+  position: relative; width: min(920px, 100%); height: min(640px, 90vh);
+  background: var(--ice-2); border-radius: var(--radius-xl); border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg, 0 30px 60px rgba(0,0,0,.35));
+  display: flex; align-items: center; justify-content: center; overflow: hidden;
+  animation: s2-tov3d-in .3s var(--ease);
+}
+@keyframes s2-tov3d-in{ from{ opacity: 0; transform: scale(.96); } to{ opacity: 1; transform: none; } }
+.s2-tov3d__model{ width: 100%; height: 100%; --poster-color: transparent; background-color: transparent; }
+.s2-tov3d__close{
+  position: absolute; top: 16px; right: 16px; z-index: 2; width: 40px; height: 40px;
+  display: flex; align-items: center; justify-content: center; border-radius: 100px;
+  background: #fff; color: var(--navy); border: 1.5px solid var(--border); box-shadow: var(--shadow-md);
+  transition: all .25s var(--ease); cursor: pointer;
+}
+.s2-tov3d__close:hover{ background: var(--navy); color: #fff; border-color: var(--navy); }
+.s2-tov3d__hint{
+  position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); z-index: 2;
+  background: rgba(10,25,45,.55); color: #fff; font-size: 12.5px; font-weight: 600;
+  padding: 7px 16px; border-radius: 100px; letter-spacing: .01em; pointer-events: none;
+}
+@media (max-width: 640px){
+  .s2-tov3d{ padding: 12px; }
+  .s2-tov3d__panel{ height: min(560px, 80vh); }
+}
 
 .s2-tov__tabs{ display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 26px; }
 .s2-tov__tab{

@@ -168,18 +168,18 @@ document.addEventListener("DOMContentLoaded", function () {
   (function techOverview() {
     const tabsWrap = document.getElementById("tovTabs2");
     const body = document.getElementById("tovBody2");
-    const model = document.getElementById("tovModel2");
+    const image = document.getElementById("tovImage2");
     const badgeEl = document.getElementById("tovBadge2");
     const section = document.getElementById("device");
-    if (!tabsWrap || !body || !model || !badgeEl || !section) return;
+    if (!tabsWrap || !body || !image || !badgeEl || !section) return;
 
-    const ORBITS = {
-      front: "0deg 75deg 105%",
-      back: "180deg 75deg 105%",
-      top: "0deg 12deg 105%",
-      bottom: "0deg 168deg 105%",
-      left: "-90deg 75deg 105%",
-      right: "90deg 75deg 105%",
+    const IMAGES = {
+      front: "img/m360/front.webp",
+      back: "img/m360/back.webp",
+      top: "img/m360/top.webp",
+      bottom: "img/m360/bottom.webp",
+      left: "img/m360/left.webp",
+      right: "img/m360/right.webp",
     };
 
     const SPECS = [
@@ -201,14 +201,14 @@ document.addEventListener("DOMContentLoaded", function () {
         details: [{ label: "Ingress", value: "IP68 rated" }, { label: "Sealing", value: "Ports, keys and speaker" }], badge: "IP68" },
     ];
 
-    let resumeTimer = null;
     function goToAngle(angle) {
-      const orbit = ORBITS[angle];
-      if (!orbit) return;
-      model.removeAttribute("auto-rotate");
-      model.cameraOrbit = orbit;
-      if (resumeTimer) clearTimeout(resumeTimer);
-      resumeTimer = setTimeout(() => model.setAttribute("auto-rotate", ""), 3200);
+      const src = IMAGES[angle];
+      if (!src || image.getAttribute("src") === src) return;
+      image.style.opacity = "0";
+      window.setTimeout(() => {
+        image.src = src;
+        image.style.opacity = "1";
+      }, 150);
     }
 
     SPECS.forEach((spec, i) => {
@@ -276,6 +276,37 @@ document.addEventListener("DOMContentLoaded", function () {
         show(current);
       }
     });
+
+    /* 360 / 3D zoom modal */
+    const openBtn = document.getElementById("tov360Btn2");
+    const modal = document.getElementById("tov360Modal2");
+    const backdrop = document.getElementById("tov360Backdrop2");
+    const closeBtn = document.getElementById("tov360Close2");
+    const modalModel = document.getElementById("tov360Model2");
+    if (openBtn && modal && backdrop && closeBtn) {
+      let lastFocused = null;
+
+      function openModal() {
+        lastFocused = document.activeElement;
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+        if (modalModel) modalModel.cameraOrbit = "0deg 75deg 105%";
+        closeBtn.focus();
+      }
+
+      function closeModal() {
+        modal.hidden = true;
+        document.body.style.overflow = "";
+        if (lastFocused) lastFocused.focus();
+      }
+
+      openBtn.addEventListener("click", openModal);
+      closeBtn.addEventListener("click", closeModal);
+      backdrop.addEventListener("click", closeModal);
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.hidden) closeModal();
+      });
+    }
   })();
 
   /* ---------------------------------------------------------------- */
